@@ -44,7 +44,7 @@ public class PlayerScript : MonoBehaviour
 
         if(horizontal > 0){
             spriteRenderer.flipX = false;
-        }else {
+        }else if(horizontal<0){
             spriteRenderer.flipX = true;
         }
     }
