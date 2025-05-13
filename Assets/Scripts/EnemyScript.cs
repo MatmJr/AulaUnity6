@@ -1,4 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
+
 
 public class EnemyScript : MonoBehaviour
 {
@@ -8,24 +10,40 @@ public class EnemyScript : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] SpriteRenderer spriteRenderer;
 
+    private bool wasGrounded = true;
 
-    void FixedUpdate()
+    void Move()
     {
         transform.Translate(Vector2.right*speed*Time.deltaTime);
-        ground = Physics2D.Linecast(groundcheck.position, transform.position, groundLayer);
-        Debug.Log(ground);
+    }
 
-        if (ground==false)
+    void CheckGroundAndFlipDirection()
+    {
+        ground = Physics2D.Linecast(groundcheck.position, transform.position, groundLayer);
+
+        if (!ground && wasGrounded)
         {
             speed *=-1;
         }
 
-        if (speed>=0)
+        wasGrounded = ground;
+    }
+
+    void UpdateSpriteDirection()
+    {
+        spriteRenderer.flipX = speed >= 0;
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag=="Player")
         {
-            spriteRenderer.flipX = true;
-        } else if (speed<0)
-        {
-            spriteRenderer.flipX = false;
+            collision.gameObject.GetComponent<PlayerScript>().Die();
         }
+    }
+    void FixedUpdate()
+    {
+        Move();
+        CheckGroundAndFlipDirection();
+        UpdateSpriteDirection();        
     }
 }
